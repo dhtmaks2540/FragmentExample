@@ -2,41 +2,91 @@ package kr.co.lee.fragmentexample
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
+import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
+import androidx.fragment.app.commitNow
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var addOrReplaceBtn: Button
+    lateinit var replaceBtn: Button
     lateinit var removeBtn: Button
+    val fragmentManager = supportFragmentManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        addOrReplaceBtn = findViewById(R.id.button1)
+        replaceBtn = findViewById(R.id.button1)
         removeBtn = findViewById(R.id.button2)
 
-        if(savedInstanceState == null) {
-            // FragmentManager를 통해서 FragmentTransaction 획득하기
-            val fragmentTransaction: FragmentTransaction =
-                supportFragmentManager.beginTransaction()
-            // add를 통해 container에 Fragment 추가
-            fragmentTransaction.add(R.id.fragment_container, FirstFragment())
-            fragmentTransaction.setReorderingAllowed(true)
-            // commit을 통해 transaction 등록
-            fragmentTransaction.commit()
+        logMessage("onCreate()")
 
-
-            // FragmentKTX의 기능을 사용하여 위의 코드를 깔끔하게 변경
-            // commit 함수 내부에 FragmentTransaction을 수신객체로 받는
-            // 함수 타입이 있어서 아래와 같이 작성 가능
-            supportFragmentManager.commit {
+        if (savedInstanceState == null) {
+            // commit 메소드(Fragment - ktx 기능 사용)
+            fragmentManager.commit {
                 setReorderingAllowed(true)
-                add(R.id.fragment_container, FirstFragment())
+                // 컨테이너에 프래그먼트 추가(태그도 추가)
+                add(R.id.fragment_container, FirstFragment(), "firstFragment")
+                add(R.id.fragment_container, SecondFragment(), "secondFragment")
+                add(R.id.fragment_container, ThirdFragment(), "thirdFragment")
+                addToBackStack(null)
             }
         }
+
+        replaceBtn.setOnClickListener {
+            val secondFragment = fragmentManager.findFragmentByTag("secondFragment")
+            fragmentManager.commit {
+                if(secondFragment != null) {
+                    // replace 메소드를 사용하여 Fragment 교체
+                    replace(R.id.fragment_container, secondFragment)
+                }
+            }
+        }
+
+        removeBtn.setOnClickListener {
+            // FragmentManager의 findFragmentByTag 메소드를 이용해 Fragment 찾기
+            val secondFragment = fragmentManager.findFragmentByTag("secondFragment")
+            fragmentManager.commit {
+                if(secondFragment != null) {
+                    remove(secondFragment)
+                } else {
+                    Toast.makeText(this@MainActivity,
+                        "SecondFragment가 존재하지 않습니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        logMessage("onStart")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        logMessage("onResume")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        logMessage("onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        logMessage("onStop")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        logMessage("onDestroy")
+    }
+
+
+    private fun logMessage(message: String) {
+        Log.i("MainActivity", "수명주기메소드 : $message")
     }
 }

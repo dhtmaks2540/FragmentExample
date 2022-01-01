@@ -8,8 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 
-class SecondFragment : Fragment(R.layout.fragment_second) {
-
+class ThirdFragment: Fragment(R.layout.fragment_third) {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -70,6 +69,6 @@ class SecondFragment : Fragment(R.layout.fragment_second) {
     }
 
     private fun logMessage(message: String) {
-        Log.i("SecondFragment", "수명주기메소드 : $message")
+        Log.i("ThirdFragment", "수명주기메소드 : $message")
     }
 }
